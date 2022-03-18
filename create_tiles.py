@@ -32,23 +32,12 @@ def get_tiles(img, tile_size_in, n_tiles, tile_size_out):
     return tiles
 
 
-all_tiles_test = {}
-for i in tqdm(range(df_test.shape[0])):
-    row = df_test.loc[i]
-    img_id = row.image_id    
-    tiff_file = os.path.join("./test/test", f"{img_id}.tiff")
-    img = skimage.io.MultiImage(tiff_file)[-1]
-    all_tiles_test[i] = get_tiles(img, 1024, 36, 128)
-df_test["tiles"] = list(all_tiles_test.values())
-df_test.to_csv("test_with_tiles.csv", index=False)
-    
-
-all_tiles_train = {}
-for i in tqdm(range(df_train.shape[0])):
-    row = df_train.loc[i]
-    img_id = row.image_id    
-    tiff_file = os.path.join("./train/train", f"{img_id}.tiff")
-    img = skimage.io.MultiImage(tiff_file)[-1]
-    all_tiles_train[i] = get_tiles(img, 1024, 36, 128)
-df_train["tiles"] = list(all_tiles_train.values())
-df_train.to_csv("train_with_tiles.csv", index=False)
+def add_column_tiles(df, path_imgs):
+    all_tiles = {}
+    for i in tqdm(range(df.shape[0])):
+        row = df.iloc[i]
+        img_id = row.image_id    
+        tiff_file = os.path.join(path_imgs, f"{img_id}.tiff")
+        img = skimage.io.MultiImage(tiff_file)[-1]
+        all_tiles[i] = get_tiles(img, 1024, 36, 128)
+    df["tiles"] = list(all_tiles_test.values())
