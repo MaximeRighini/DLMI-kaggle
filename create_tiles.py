@@ -25,7 +25,7 @@ def get_tiles(img, tile_size_in, n_tiles, tile_size_out):
     # store the tiles
     tiles = []
     for i in range(len(img)):
-        tiles.append({'img':cv2.resize(img[i], (tile_size_out, tile_size_out)), 'idx':i})
+        tiles.append(cv2.resize(img[i], (tile_size_out, tile_size_out)).tolist())
     return tiles
 
 
@@ -37,5 +37,15 @@ def add_column_tiles(df, path_imgs):
         tiff_file = os.path.join(path_imgs, f"{img_id}.tiff")
         img = skimage.io.MultiImage(tiff_file)[-1]
         img[img.mean(axis=-1)>=235] = 0
-        all_tiles[i] = get_tiles(img, int(np.sqrt((img!=0).sum())/14), 100, 100)
+        all_tiles[i] = get_tiles(img, int(np.sqrt((img!=0).sum())/14), 100, 128)
     df["tiles"] = list(all_tiles.values())
+
+
+df_train = pd.read_csv("train.csv").reset_index(drop=True)
+df_test = pd.read_csv("test.csv").reset_index(drop=True)
+
+add_column_tiles(df_train, "./train/train")
+df_train.to_csv("train_with_tiles.csv", index=False)
+
+add_column_tiles(df_test, "./test/test")
+df_test.to_csv("test_with_tiles.csv", index=False)
